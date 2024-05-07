@@ -2,15 +2,106 @@
 
 ---
 
-<html lang="en">
+<html lang="ja">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro</title>
+
+		<script type="module">
+			const time = document.querySelector('#time');
+
+			const elem_lock_button = document.querySelector('#lock');
+			const elem_unlock_button = document.querySelector('#unlock');
+
+			const elem_voice_button = document.querySelector('#voice');
+
+
+			const update = fmt => {
+				const _date = new Date();
+				time.textContent = _date.toLocaleString(fmt);
+			}
+
+			let _wakeLock = null;
+			const wake_lock = async _ => {
+				try {
+					_wakeLock = await navigator.wakeLock.request('screen');
+					_wakeLock.addEventListener('release', _ => {
+						console.log('wakeLock: off (released)');
+					}, { once: true });
+					console.log('wakeLock: on (locked)');
+				} catch(e) {
+					console.error(e);
+				}
+			}
+
+			const main = _ => {
+				update('ja-JP');
+				requestAnimationFrame(main);
+			}
+
+			const _change_visible = async _ => {
+				if (_wakeLock !== null && document.visibilityState === 'visible') {
+					await wake_lock();
+				}
+			};
+			const _click_lock = async e => {
+				elem_lock_button.disabled = true;
+				elem_unlock_button.disabled = false;
+
+				await wake_lock();
+				document.addEventListener('visibilitychange', _change_visible);
+				
+				elem_unlock_button.addEventListener('click', _click_unlock, { once: true });
+			};
+			const _click_unlock = async _ => {
+				elem_lock_button.disabled = false;
+				elem_unlock_button.disabled = true;
+
+				document.removeEventListener('visibilitychange',_change_visible);
+				if (_wakeLock !== null) {
+					await _wakeLock.release();
+				}
+
+				elem_lock_button.addEventListener('click', _click_lock, { once: true });
+			};
+
+		
+			if ('wakeLock' in navigator) {
+				elem_lock_button.disabled = false;
+				elem_lock_button.addEventListener('click', _click_lock);
+			} else {
+				console.error('no support');
+			}
+
+			elem_voice_button.addEventListener('click', _ => {
+				setInterval(_ => {
+					const _utter = new SpeechSynthesisUtterance(time.textContent);
+					window.speechSynthesis.speak(_utter)
+				}, 10000)
+			});
+
+
+			main();
+
+		</script>
 	</head>
 	<body>
 		<h1>Astro</h1>
+
+		<div>
+			<span id="time"></span>
+		</div>
+
+		<div>
+			<button id="lock" disabled>Lock</button>
+			<button id="unlock" disabled>Unlock</button>
+		</div>
+
+		<div>
+			<button id="voice">Voice</button>
+		</div>
 	</body>
 </html>
