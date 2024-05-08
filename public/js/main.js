@@ -1,3 +1,5 @@
+const _no_sleep = new NoSleep();
+
 class Interval {
     constructor(element) {
         this.element = element;
@@ -107,15 +109,17 @@ const _click_lock_fallback = _ => {
     elem_lock_button.disabled = true;
     elem_unlock_button.disabled = false;
 
-    elem_prevent_sleep.play();
+    _no_sleep.enable();
+    console.log('wakeLock[fallback]: on (enabled)');
     
     elem_unlock_button.addEventListener('click', _click_unlock_fallback, { once: true });
 };
-const _click_unlock_fallback = async _ => {
+const _click_unlock_fallback = _ => {
     elem_lock_button.disabled = false;
     elem_unlock_button.disabled = true;
 
-    await elem_prevent_sleep.pause();
+    _no_sleep.disable();
+    console.log('wakeLock[fallback]: off (disabled)');
 
     elem_lock_button.addEventListener('click', _click_lock_fallback, { once: true });
 };
@@ -127,11 +131,7 @@ if ('wakeLock' in navigator) {
     elem_lock_button.addEventListener('click', _click_lock);
 } else {
     console.log('wakeLock: non-supported browser (fallback mode)');
-    elem_prevent_sleep.addEventListener('canplaythrough', _ => {
-        console.log('wakeLock[fallback]: video loaded');
-        elem_prevent_sleep.pause();
-        elem_lock_button.addEventListener('click', _click_lock_fallback);
-    }, { once: true });
+    elem_lock_button.addEventListener('click', _click_lock_fallback);
 }
 elem_lock_button.disabled = false;
 
@@ -185,13 +185,14 @@ elem_reset_button.addEventListener('click', _ => {
 elem_prevent_sleep.addEventListener('timeupdate', _ => {
     console.log('wakeLock[fallback]: video playing...');
 });
-*/
+
 elem_prevent_sleep.addEventListener('pause', _ => {
     console.log('wakeLock[fallback]: video pause');
 });
 elem_prevent_sleep.addEventListener('play', _ => {
     console.log('wakeLock[fallback]: video start');
 });
+*/
 
 /*
 fetch('./sample-video-2.mp4')
