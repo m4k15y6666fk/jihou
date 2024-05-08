@@ -1,0 +1,3 @@
+[submodule "NoSleep.js"]
+	path = NoSleep.js
+	url = https://github.com/richtr/NoSleep.js.git

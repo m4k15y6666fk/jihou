@@ -4,104 +4,177 @@
 
 <html lang="ja">
 	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="title" content="時報 / Jihou">
+		<meta name="description" content="一定の間隔で時刻を読み上げる">
+		<meta name="keywords" content="time signal,announcement">
+		<meta name="robots" content="index, follow">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="language" content="Japanese">
+		<meta name="author" content="hiiro">
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
 
-		<script type="module">
-			const time = document.querySelector('#time');
+		<title>時報 / Jihou</title>
 
-			const elem_lock_button = document.querySelector('#lock');
-			const elem_unlock_button = document.querySelector('#unlock');
+		<!-- favicon -->
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<link rel="manifest" href="/site.webmanifest">
 
-			const elem_voice_button = document.querySelector('#voice');
+		<!-- Bulma CSS-->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css" />
 
+		<!-- Font Awesome -->
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+			integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css"
+			integrity="sha512-sVSECYdnRMezwuq5uAjKQJEcu2wybeAPjU4VJQ9pCRcCY4pIpIw4YMHIOQ0CypfwHRvdSPbH++dA3O4Hihm/LQ=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		/>
 
-			const update = fmt => {
-				const _date = new Date();
-				time.textContent = _date.toLocaleString(fmt);
-			}
+		<!-- moment.js -->
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment-with-locales.min.js"
+			integrity="sha512-4F1cxYdMiAW98oomSLaygEwmCnIP38pb4Kx70yQYqRwLVCs3DbRumfBq82T08g/4LJ/smbFGFpmeFlQgoDccgg=="
+			crossorigin="anonymous"
+			referrerpolicy="no-referrer"
+		></script>
 
-			let _wakeLock = null;
-			const wake_lock = async _ => {
-				try {
-					_wakeLock = await navigator.wakeLock.request('screen');
-					_wakeLock.addEventListener('release', _ => {
-						console.log('wakeLock: off (released)');
-					}, { once: true });
-					console.log('wakeLock: on (locked)');
-				} catch(e) {
-					console.error(e);
-				}
-			}
-
-			const main = _ => {
-				update('ja-JP');
-				requestAnimationFrame(main);
-			}
-
-			const _change_visible = async _ => {
-				if (_wakeLock !== null && document.visibilityState === 'visible') {
-					await wake_lock();
-				}
-			};
-			const _click_lock = async e => {
-				elem_lock_button.disabled = true;
-				elem_unlock_button.disabled = false;
-
-				await wake_lock();
-				document.addEventListener('visibilitychange', _change_visible);
-				
-				elem_unlock_button.addEventListener('click', _click_unlock, { once: true });
-			};
-			const _click_unlock = async _ => {
-				elem_lock_button.disabled = false;
-				elem_unlock_button.disabled = true;
-
-				document.removeEventListener('visibilitychange',_change_visible);
-				if (_wakeLock !== null) {
-					await _wakeLock.release();
-				}
-
-				elem_lock_button.addEventListener('click', _click_lock, { once: true });
-			};
-
-		
-			if ('wakeLock' in navigator) {
-				elem_lock_button.disabled = false;
-				elem_lock_button.addEventListener('click', _click_lock);
-			} else {
-				console.error('no support');
-			}
-
-			elem_voice_button.addEventListener('click', _ => {
-				setInterval(_ => {
-					const _utter = new SpeechSynthesisUtterance(time.textContent);
-					window.speechSynthesis.speak(_utter)
-				}, 10000)
-			});
-
-
-			main();
-
-		</script>
+		<script type="module" src="./js/main.js"></script>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<div class="content mx-6 mt-6">
+			<h2>時報 / Jihou</h2>
 
-		<div>
-			<span id="time"></span>
+			<video muted autoplay playsinline preload="auto" loop="loop" id="prevent-sleep" style="display: none;">
+			<!-- <video muted playsinline autoplay preload loop id="prevent-sleep" style="display: none;"> -->
+				<source src="/video/sample-video.mp4">
+				<source src="/video/sample-video-fallback.mp4">
+			</video>
+
+			<div class="block">
+				<p class="has-text-centered is-size-1" id="time"></p>
+			</div>
+
+			<div class="block">
+				<div class="field">
+					<div class="field is-grouped">
+						<button class="button is-link" id="lock" disabled>
+							<span class="icon-text">
+								<span class="icon">
+									<i class="fas fa-eye"></i>
+								</span>
+								<span>Lock</span>
+							</span>
+						</button>
+						<button class="button" id="unlock" disabled>
+							<span class="icon-text">
+								<span class="icon">
+									<i class="fas fa-eye-slash"></i>
+								</span>
+								<span>Unlock</span>
+							</span>
+						</button>
+					</div>
+					<p class="help">&#8251;&#32;端末のスリープを防止</p>
+				</div>
+			</div>
+
+			<div class="block">
+				<div class="field">
+					<div class="field is-grouped">
+						<button class="button is-primary" id="start-button">
+							<span class="icon-text">
+								<span class="icon">
+									<i class="fas fa-volume-up"></i>
+								</span>
+								<span>Start</span>
+							</span>
+						</button>
+						<button class="button" id="stop-button" disabled>
+							<span class="icon-text">
+								<span class="icon">
+									<i class="fas fa-volume-mute"></i>
+								</span>
+								<span>Stop</span>
+							</span>
+						</button>
+					</div>
+					<p class="help">&#8251;&#32;読み上げを開始</p>
+				</div>
+			</div>
+
+			<hr>
+
+			<div class="block">
+				<div class="field">
+					<label for="">Interval:</label>
+					<div class="control">
+						<input class="input" type="number" id="voice-interval" value="300" min="1" step="1" />
+					</div>
+					<p class="help">&#8251;&#32;アナウンスの間隔（秒）</p>
+				</div>
+			</div>
+
+			<div class="block">
+				<div class="field">
+					<label for="">Display:</label>
+					<div class="control">
+						<input class="input" type="text" id="display-format" value="HH:mm:ss" />
+					</div>
+					<p class="help">&#8251;&#32;時間表示のフォーマット ( <a href="https://momentjs.com/docs/#/parsing/string-format/">https://momentjs.com/docs/#/parsing/string-format/</a> )</p>
+				</div>
+			</div>
+
+			<div class="block">
+				<div class="field">
+					<label for="">Voice:</label>
+					<div class="control">
+						<input class="input" type="text" id="voice-format" value="H 時 m 分" />
+					</div>
+					<p class="help">&#8251;&#32;読み上げのフォーマット ( <a href="https://momentjs.com/docs/#/parsing/string-format/">https://momentjs.com/docs/#/parsing/string-format/</a> )</p>
+				</div>
+			</div>
+
+			<hr>
+
+			<div class="block">
+				<div class="field">
+					<button class="button is-danger" id="reset-button">
+						<span class="icon-text">
+							<span class="icon">
+								<i class="fas fa-trash-alt"></i>
+							</span>
+							<span>Reset</span>
+						</span>
+					</button>
+					<p class="help">&#8251;&#32;設定をデフォルトに戻す</p>
+				</div>
+			</div>
 		</div>
 
-		<div>
-			<button id="lock" disabled>Lock</button>
-			<button id="unlock" disabled>Unlock</button>
-		</div>
-
-		<div>
-			<button id="voice">Voice</button>
-		</div>
+		<footer class="footer">
+			<div class="content has-text-centered">
+				<p>
+					<span class="icon-text">
+					<span class="icon">
+						<i class="far fa-copyright"></i>
+					</span>
+					<span>2024 <a href="https://github.com/m4k15y6666fk/">hiiro</a></span>
+					</span>
+				</p>
+			</div>
+		</footer>
 	</body>
 </html>
