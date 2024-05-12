@@ -2,17 +2,26 @@
 
 ---
 
-<html lang="ja">
+<html lang="ja" prefix="og: https://ogp.me/ns#">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta name="title" content="時報 / Jihou">
-		<meta name="description" content="一定の間隔で時刻を読み上げる">
+		<meta name="description" content="一定の間隔で時刻を読み上げるアプリ">
 		<meta name="keywords" content="time signal,announcement">
 		<meta name="robots" content="index, follow">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="language" content="Japanese">
 		<meta name="author" content="hiiro">
+
+		<meta property="og:url" content="https://jihou.pages.dev">
+		<meta property="og:type" content="website">
+		<meta property="og:title" content="時報 / Jihou">
+		<meta property="og:description" content="一定の間隔で時刻を読み上げるアプリ">
+		<meta property="og:image" content="/ogp.png">
+
+		<meta property="twitter:card" content="summary">
+
 		<meta name="generator" content={Astro.generator} />
 
 		<title>時報 / Jihou</title>
@@ -56,7 +65,59 @@
 	</head>
 	<body>
 		<div class="content mx-6 mt-6">
-			<h2>時報 / Jihou</h2>
+			<h2 class="mb-6">時報 / Jihou</h2>
+
+			<p>一定時間ごとに、現在時刻を音声でアナウンスするアプリです。</p>
+
+			<hr>
+
+			<div class="block">
+				<div class="field is-grouped">
+					<a href="https://potofu.me/m4k15y6666fk/" class="button is-rounded">
+						<span class="icon-text">
+						<span class="icon">
+							<i class="fas fa-list"></i>
+						</span>
+						<span>作者プロフィール</span>
+						</span>
+					</a>
+
+					<a href="https://github.com/m4k15y6666fk/jihou" class="button is-rounded">
+						<span class="icon-text">
+						<span class="icon">
+							<i class="fab fa-github"></i>
+						</span>
+						<span>GitHub</span>
+						</span>
+					</a>
+				</div>
+			</div>
+
+			<div class="block">
+				<div class="field">
+					<div class="field is-grouped">
+						<a href="https://ofuse.me/m4k15y6666fk" class="button is-rounded">
+							<span class="icon-text">
+							<span class="icon has-text-danger">
+								<i class="fas fa-heart"></i>
+							</span>
+							<span>寄付・ファンレター はこちら</span>
+							</span>
+						</a>
+						<a href="https://www.wish-gift.net/wish-list/j8jYVkG" class="button is-rounded">
+							<span class="icon-text">
+							<span class="icon has-text-warning">
+								<i class="fas fa-gift"></i>
+							</span>
+							<span>ほしいものリスト</span>
+							</span>
+						</a>
+					</div>
+					<p class="help">&#8251;&#32;このサイトが気に入ったら、ご支援をお願いします</p>
+				</div>
+			</div>
+
+			<hr>
 
 			<!-- <video muted autoplay playsinline preload="auto" loop="loop" id="prevent-sleep" style="display: none;"> -->
 			<!-- <video muted playsinline autoplay preload loop id="prevent-sleep" style="display: none;"> -->
